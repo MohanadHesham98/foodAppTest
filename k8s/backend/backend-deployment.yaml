@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: mohanad898/food-backend:latest
+        image: mohanad898/backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
