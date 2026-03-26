@@ -1,9 +1,23 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
   name: mongodb
   namespace: food
 spec:
+  clusterIP: None        # Headless service
+  selector:
+    app: mongodb
+  ports:
+    - port: 27017
+      name: mongo
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: food
+spec:
+  serviceName: "mongodb"   # Must match headless service
   replicas: 1
   selector:
     matchLabels:
@@ -28,10 +42,17 @@ spec:
             secretKeyRef:
               name: food-secrets
               key: MONGO_INITDB_ROOT_PASSWORD
+        ports:
+        - containerPort: 27017
+          name: mongo
         volumeMounts:
         - name: mongo-data
           mountPath: /data/db
-      volumes:
-      - name: mongo-data
-        persistentVolumeClaim:
-          claimName: mongo-pvc
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi   # adjust as needed
