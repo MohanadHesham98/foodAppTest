@@ -5,8 +5,7 @@ export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
-  const url = import.meta.env.VITE_BACKEND_URL;
-  console.log("Backend URL:", url);
+  const url = ""; // ✅ no env anymore
   const [token, setToken] = useState("");
   const [food_list, setFoodList] = useState([]);
   const [name, setname] = useState("");
@@ -27,7 +26,7 @@ const StoreContextProvider = (props) => {
   }, []);
 
   const fetchFoodList = async () => {
-    const response = await axios.get(url + "/api/food/list");
+    const response = await axios.get("/api/food/list");
     setFoodList(response.data.food);
   };
 
@@ -39,7 +38,7 @@ const StoreContextProvider = (props) => {
     }
     if (token) {
       await axios.post(
-        `${url}/api/cart/add`,
+        `/api/cart/add`,
         { itemId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -50,7 +49,7 @@ const StoreContextProvider = (props) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
     if (token) {
       await axios.post(
-        `${url}/api/cart/remove`,
+        `/api/cart/remove`,
         { itemId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -71,7 +70,7 @@ const StoreContextProvider = (props) => {
   const loadCartData = async (token) => {
     if (token) {
       const response = await axios.post(
-        `${url}/api/cart/get`,
+        `/api/cart/get`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

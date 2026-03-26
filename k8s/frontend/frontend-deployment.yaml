@@ -14,11 +14,8 @@ spec:
         app: frontend
     spec:
       containers:
-      - name: frontend
-        image: mohanad898/frontend:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-        envFrom:
-        - configMapRef:
-            name: frontend-config
+        - name: frontend
+          image: mohanad898/frontend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

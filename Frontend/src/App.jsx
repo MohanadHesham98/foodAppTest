@@ -19,25 +19,26 @@ const App = () => {
   const {url} =useContext(StoreContext)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`${url}`);
-        console.log(res);
-        toast.success(res.data.message);
-        clearInterval(intervalId); 
-      } catch (error) {
-        console.error("Error connecting to server");
-        toast("Backend Server Take a while to Wake up, Please Wait!" , {icon: "⏳"} );
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const res = await axios.get("/api");
+      console.log(res);
+      toast.success(res.data.message);
+      clearInterval(intervalId);
+    } catch (error) {
+      console.error("Error connecting to server");
+      toast("Backend Server Take a while to Wake up, Please Wait!", {
+        icon: "⏳",
+      });
+    }
+  };
 
-    const intervalId = setInterval(fetchData, 30000); 
+  const intervalId = setInterval(fetchData, 30000);
 
-    fetchData();
+  fetchData();
 
-   
-    return () => clearInterval(intervalId);
-  }, []);
+  return () => clearInterval(intervalId);
+}, []);
 
   return (
     <>
