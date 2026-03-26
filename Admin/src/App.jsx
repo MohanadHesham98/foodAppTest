@@ -5,7 +5,6 @@ import Add from "./pages/Add/Add";
 import List from "./pages/List/List";
 import Orders from "./pages/Orders/Orders";
 import PromoCode from "./pages/PromoCode/PromoCode";
-import UpdatePromoCode from "./pages/PromoCode/UpdatePromoCode";
 import Login from "./pages/Login/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import WelcomeAdmin from "./pages/WelcomeAdmin/WelcomeAdmin";
@@ -13,7 +12,7 @@ import { Toaster } from "react-hot-toast";
 import { StoreContext } from "./context/StoreContext";
 
 const App = () => {
-  const url = import.meta.env.VITE_BACKEND_URL;
+  const url = ""; // ✅ no env anymore
   const { isAuthenticated } = useContext(StoreContext);
 
   return (
