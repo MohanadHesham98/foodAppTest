@@ -13,6 +13,8 @@ spec:
       labels:
         app: frontend
     spec:
+      nodeSelector:
+        role: public
       containers:
         - name: frontend
           image: mohanad898/frontend:latest
