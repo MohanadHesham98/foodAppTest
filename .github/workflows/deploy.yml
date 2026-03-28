@@ -1,0 +1,63 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 📥 Pull code
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 🔐 Docker login
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u $DOCKER_USERNAME --password-stdin
+
+    # 🏗 Build images
+    - name: Build Backend
+      run: docker build -t $DOCKER_USERNAME/backend:$IMAGE_TAG ./Backend
+
+    - name: Build Frontend
+      run: docker build -t $DOCKER_USERNAME/frontend:$IMAGE_TAG ./Frontend
+
+    - name: Build Admin
+      run: docker build -t $DOCKER_USERNAME/admin:$IMAGE_TAG ./Admin
+
+    # 🚀 Push images
+    - name: Push Backend
+      run: docker push $DOCKER_USERNAME/backend:$IMAGE_TAG
+
+    - name: Push Frontend
+      run: docker push $DOCKER_USERNAME/frontend:$IMAGE_TAG
+
+    - name: Push Admin
+      run: docker push $DOCKER_USERNAME/admin:$IMAGE_TAG
+
+    # ☸️ Setup kubeconfig
+    - name: Set up kubeconfig
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+
+    # 🔄 Update deployments with new image
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl set image deployment/backend backend=$DOCKER_USERNAME/backend:$IMAGE_TAG -n food
+        kubectl set image deployment/frontend frontend=$DOCKER_USERNAME/frontend:$IMAGE_TAG -n food
+        kubectl set image deployment/admin admin=$DOCKER_USERNAME/admin:$IMAGE_TAG -n food
+
+    # 🔁 Rollout status
+    - name: Check rollout
+      run: |
+        kubectl rollout status deployment/backend -n food
+        kubectl rollout status deployment/frontend -n food
+        kubectl rollout status deployment/admin -n food
