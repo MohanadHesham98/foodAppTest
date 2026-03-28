@@ -48,7 +48,7 @@ jobs:
             docker push ${{ secrets.DOCKER_USERNAME }}/admin:latest
 
             # 6️⃣ Deploy K3s manifests
-            NAMESPACE=foodapp
+            NAMESPACE=food
             kubectl get namespace $NAMESPACE || kubectl create namespace $NAMESPACE
             kubectl apply -f $HOME/foodApp/k8s/mongodb -n $NAMESPACE
             kubectl apply -f $HOME/foodApp/k8s/backend -n $NAMESPACE
