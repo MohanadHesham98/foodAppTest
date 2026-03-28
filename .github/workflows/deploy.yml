@@ -1,7 +1,7 @@
 name: Deploy FoodApp to K3s
 
 on:
-  push:
+  push: 
     branches:
       - main
 
