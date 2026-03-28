@@ -1,63 +1,78 @@
-name: CI/CD Pipeline
+# .github/workflows/ci-cd.yaml
+name: CI/CD FoodApp
 
 on:
   push:
     branches:
       - main
-
-env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  IMAGE_TAG: ${{ github.sha }}
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 📥 Pull code
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # 1️⃣ Checkout repo
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    # 🔐 Docker login
-    - name: Login to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u $DOCKER_USERNAME --password-stdin
+      # 2️⃣ Login to Docker Hub
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # 🏗 Build images
-    - name: Build Backend
-      run: docker build -t $DOCKER_USERNAME/backend:$IMAGE_TAG ./Backend
+      # 3️⃣ Build & Push backend image
+      - name: Build & Push Backend Image
+        run: |
+          docker build -t mohanad898/backend:latest ./Backend
+          docker push mohanad898/backend:latest
 
-    - name: Build Frontend
-      run: docker build -t $DOCKER_USERNAME/frontend:$IMAGE_TAG ./Frontend
+      # 4️⃣ Build & Push frontend image
+      - name: Build & Push Frontend Image
+        run: |
+          docker build -t mohanad898/frontend:latest ./Frontend
+          docker push mohanad898/frontend:latest
 
-    - name: Build Admin
-      run: docker build -t $DOCKER_USERNAME/admin:$IMAGE_TAG ./Admin
+      # 5️⃣ Build & Push admin image
+      - name: Build & Push Admin Image
+        run: |
+          docker build -t mohanad898/admin:latest ./Admin
+          docker push mohanad898/admin:latest
 
-    # 🚀 Push images
-    - name: Push Backend
-      run: docker push $DOCKER_USERNAME/backend:$IMAGE_TAG
+      # 6️⃣ Setup kubeconfig
+      - name: Setup Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
 
-    - name: Push Frontend
-      run: docker push $DOCKER_USERNAME/frontend:$IMAGE_TAG
+      # 7️⃣ Deploy to k3s
+      - name: Deploy to Kubernetes
+        run: |
+          # Create namespace if not exists
+          kubectl get ns food || kubectl create ns food
 
-    - name: Push Admin
-      run: docker push $DOCKER_USERNAME/admin:$IMAGE_TAG
+          # Apply Secrets
+          kubectl apply -f k8s/food-secrets.yaml -n food
 
-    # ☸️ Setup kubeconfig
-    - name: Set up kubeconfig
-      run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+          # Apply MongoDB (Private Node)
+          kubectl apply -f k8s/mongodb/mongo-StatefulSet-Service.yaml -n food
 
-    # 🔄 Update deployments with new image
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl set image deployment/backend backend=$DOCKER_USERNAME/backend:$IMAGE_TAG -n food
-        kubectl set image deployment/frontend frontend=$DOCKER_USERNAME/frontend:$IMAGE_TAG -n food
-        kubectl set image deployment/admin admin=$DOCKER_USERNAME/admin:$IMAGE_TAG -n food
+          # Apply Backend (Public Node)
+          kubectl apply -f k8s/backend/backend.yaml -n food
 
-    # 🔁 Rollout status
-    - name: Check rollout
-      run: |
-        kubectl rollout status deployment/backend -n food
-        kubectl rollout status deployment/frontend -n food
-        kubectl rollout status deployment/admin -n food
+          # Apply Frontend (Public Node)
+          kubectl apply -f k8s/frontend/frontend.yaml -n food
+
+          # Apply Admin (Public Node)
+          kubectl apply -f k8s/admin/admin.yaml -n food
+
+      # 8️⃣ Rollout status check
+      - name: Check Deployment Status
+        run: |
+          kubectl rollout status deployment/backend -n food
+          kubectl rollout status deployment/frontend -n food
+          kubectl rollout status deployment/admin -n food
+          kubectl get pods -n food -o wide
