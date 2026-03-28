@@ -1,78 +1,58 @@
-# .github/workflows/ci-cd.yaml 
-name: CI/CD FoodApp
+name: Build and Deploy to EC2
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repo
+      # Checkout the repo
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Login to Docker Hub
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
+      # Login to Docker Hub
+      - name: Docker Login
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3️⃣ Build & Push backend image
-      - name: Build & Push Backend Image
+      # Build and push Backend
+      - name: Build & Push Backend
         run: |
-          docker build -t mohanad898/backend:latest ./Backend
-          docker push mohanad898/backend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./Backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
-      # 4️⃣ Build & Push frontend image
-      - name: Build & Push Frontend Image
+      # Build and push Admin
+      - name: Build & Push Admin
         run: |
-          docker build -t mohanad898/frontend:latest ./Frontend
-          docker push mohanad898/frontend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/admin:latest ./Admin
+          docker push ${{ secrets.DOCKER_USERNAME }}/admin:latest
 
-      # 5️⃣ Build & Push admin image
-      - name: Build & Push Admin Image
+      # Build and push Frontend
+      - name: Build & Push Frontend
         run: |
-          docker build -t mohanad898/admin:latest ./Admin
-          docker push mohanad898/admin:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./Frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
-      # 6️⃣ Setup kubeconfig
-      - name: Setup Kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-
-      # 7️⃣ Deploy to k3s
-      - name: Deploy to Kubernetes
-        run: |
-          # Create namespace if not exists
-          kubectl get ns food || kubectl create ns food
-
-          # Apply Secrets
-          kubectl apply -f k8s/food-secrets.yaml -n food
-
-          # Apply MongoDB (Private Node)
-          kubectl apply -f k8s/mongodb/mongo-StatefulSet-Service.yaml -n food
-
-          # Apply Backend (Public Node)
-          kubectl apply -f k8s/backend/backend.yaml -n food
-
-          # Apply Frontend (Public Node)
-          kubectl apply -f k8s/frontend/frontend.yaml -n food
-
-          # Apply Admin (Public Node)
-          kubectl apply -f k8s/admin/admin.yaml -n food
-
-      # 8️⃣ Rollout status check
-      - name: Check Deployment Status
-        run: |
-          kubectl rollout status deployment/backend -n food
-          kubectl rollout status deployment/frontend -n food
-          kubectl rollout status deployment/admin -n food
-          kubectl get pods -n food -o wide
+      # Deploy to EC2 using SSH
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p $HOME/.kube
+            # Apply namespace
+            kubectl get namespace foodapp || kubectl create namespace foodapp
+            # Apply all Kubernetes manifests
+            kubectl apply -f ~/foodApp/k8s/mongodb -n foodapp
+            kubectl apply -f ~/foodApp/k8s/backend -n foodapp
+            kubectl apply -f ~/foodApp/k8s/admin -n foodapp
+            kubectl apply -f ~/foodApp/k8s/frontend -n foodapp
+            kubectl apply -f ~/foodApp/k8s/food-secrets.yaml -n foodapp
