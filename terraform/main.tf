@@ -9,7 +9,7 @@ resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name = "foodapp-vpc"
+    Name = "lab"
   }
 }
 
@@ -20,7 +20,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "foodapp-igw"
+    Name = "igw"
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "foodapp-public-subnet"
+    Name = "public"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_subnet" "private" {
   cidr_block = "10.0.2.0/24"
 
   tags = {
-    Name = "foodapp-private-subnet"
+    Name = "private"
   }
 }
 
@@ -64,7 +64,7 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public.id
 
   tags = {
-    Name = "foodapp-nat"
+    Name = "ngw"
   }
 
   depends_on = [aws_internet_gateway.igw]
@@ -82,7 +82,7 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "public-rt"
+    Name = "public"
   }
 }
 
@@ -103,7 +103,7 @@ resource "aws_route_table" "private_rt" {
   }
 
   tags = {
-    Name = "private-rt"
+    Name = "private"
   }
 }
 
@@ -169,7 +169,7 @@ variable "ami_id" {
 }
 
 variable "instance_type" {
-  default = "t3.micro"
+  default = "t3.small"
 }
 
 variable "key_name" {
@@ -185,7 +185,7 @@ resource "aws_instance" "master" {
   key_name               = var.key_name
 
   tags = {
-    Name = "master-node"
+    Name = "master"
   }
 }
 
