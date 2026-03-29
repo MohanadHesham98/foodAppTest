@@ -4,7 +4,8 @@
 This repository contains the FoodApp application with a GitHub Actions workflow to automatically build, push Docker images, and deploy to a K3s cluster on an EC2 instance.
 
 ---
-
+<img width="1408" height="768" alt="Gemini_Generated_Image_x9z39yx9z39yx9z3" src="https://github.com/user-attachments/assets/515fd17b-6848-48ac-a8d1-59c4e5d34389" />
+---
 ## Deployment Steps
 
 1. **Push to `main` branch**  
