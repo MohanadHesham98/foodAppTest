@@ -56,5 +56,3 @@ jobs:
             kubectl apply -f $HOME/foodApp/k8s/frontend -n $NAMESPACE
             kubectl apply -f $HOME/foodApp/k8s/food-secrets.yaml -n $NAMESPACE
 
-            # 7️⃣ Verify pods
-            kubectl get pods -n $NAMESPACE
