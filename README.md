@@ -94,8 +94,8 @@ This will create the VPC, subnets, gateways, route tables, EC2 instances, and se
      ```
  - Add Labels (on Master Node):
    ```
-   kubectl label node worker01 app=public
-   kubectl label node worker02 app=private
+   kubectl label node worker01 role=public
+   kubectl label node worker02 role=private
    ```
 - Add taint to worker02 node (private ec2 for database):
    ```
@@ -146,4 +146,4 @@ This will create the VPC, subnets, gateways, route tables, EC2 instances, and se
 1. Push your code to the `main` branch.
 2. GitHub Actions will automatically run the workflow.
 3. Check the workflow logs to verify Docker images are built and pushed, and K3s manifests are applied successfully.
-4. Use `kubectl get pods -n foodapp` on the EC2 instance to see running pods.
+4. Use `kubectl get pods -n food` on the EC2 instance to see running pods.
