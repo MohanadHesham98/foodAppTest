@@ -36,13 +36,13 @@ The infrastructure is fully managed with Terraform (Infrastructure as Code).
   
 6. CI/CD Pipeline (GitHub Actions)
 The pipeline automatically:
-- Triggers on every push to `main`
-- Builds Docker images
-- Pushes images to Docker Hub
-- Connects to EC2 via SSH
-- Pulls latest code
-- Applies Kubernetes manifests
-- Updates running pods
+   - Triggers on every push to `main`
+   - Builds Docker images
+   - Pushes images to Docker Hub
+   - Connects to EC2 via SSH
+   - Pulls latest code
+   - Applies Kubernetes manifests
+   - Updates running pods
 ---
 
 ## Required GitHub Secrets
@@ -56,7 +56,7 @@ Before running the workflow, make sure the following GitHub Secrets are configur
 | `SSH_PRIVATE_KEY`     | Private SSH key with access to the EC2 instance |
 | `DOCKER_USERNAME`     | Docker Hub username                              |
 | `DOCKER_PASSWORD`     | Docker Hub password                              |
-| `KUBECONFIG_DATA`     | (Optional) Base64-encoded K3s kubeconfig if not using local `/etc/rancher/k3s/k3s.yaml` |
+| `KUBECONFIG_DATA`     | (Optional) Base64-encoded K3s kubeconfig if not using local `/etc/rancher/k3s/k3s.yaml` change localhost ip to private ip `server: https://<MASTER_PRIVATE_IP>:6443`|
 
 > **Important:** Make sure these secrets are properly configured before anyone clones this repository or pushes to `main`. Otherwise, the deployment workflow will fail.
 
