@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: food
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -13,19 +13,17 @@ spec:
       labels:
         app: backend
     spec:
-      nodeSelector:
-        role: public
       containers:
-      - name: backend
-        image: mohanad898/backend:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 5000
-        envFrom:
-        - configMapRef:
-            name: backend-config
-        - secretRef:
-            name: food-secrets
+        - name: backend
+          image: mohanad898/backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: food-secrets
 ---
 apiVersion: v1
 kind: Service
