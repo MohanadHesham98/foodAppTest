@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: food
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -13,19 +13,20 @@ spec:
       labels:
         app: frontend
     spec:
-      nodeSelector:
-        role: public
       containers:
         - name: frontend
           image: mohanad898/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: frontend-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-nodeport
+  name: frontend
   namespace: food
 spec:
   selector:
@@ -34,5 +35,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30000
-  type: NodePort
+  type: ClusterIP
