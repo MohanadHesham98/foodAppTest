@@ -13,22 +13,20 @@ spec:
       labels:
         app: admin
     spec:
-      nodeSelector:
-        role: public
       containers:
-      - name: admin
-        image: mohanad898/admin:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-        envFrom:
-        - configMapRef:
-            name: frontend-config
+        - name: admin
+          image: mohanad898/admin:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: frontend-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: admin-nodeport
+  name: admin
   namespace: food
 spec:
   selector:
@@ -37,5 +35,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30001
-  type: NodePort
+  type: ClusterIP
