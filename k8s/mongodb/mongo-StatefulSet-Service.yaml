@@ -27,39 +27,32 @@ spec:
       labels:
         app: mongodb
     spec:
-      nodeSelector:
-        role: private
-      tolerations:
-      - key: "dedicated"
-        operator: "Equal"
-        value: "db"
-        effect: "NoSchedule"
       containers:
-      - name: mongodb
-        image: mongo:6.0
-        imagePullPolicy: IfNotPresent
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: food-secrets
-              key: MONGO_INITDB_ROOT_USERNAME
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: food-secrets
-              key: MONGO_INITDB_ROOT_PASSWORD
-        ports:
-        - containerPort: 27017
-          name: mongo
-        volumeMounts:
-        - name: mongo-data
-          mountPath: /data/db
+        - name: mongodb
+          image: mongo:6.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: food-secrets
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: food-secrets
+                  key: MONGO_INITDB_ROOT_PASSWORD
+          ports:
+            - containerPort: 27017
+              name: mongo
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
   volumeClaimTemplates:
-  - metadata:
-      name: mongo-data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 10Gi
+    - metadata:
+        name: mongo-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
