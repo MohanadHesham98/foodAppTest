@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Add from "./pages/Add/Add";
@@ -10,10 +10,17 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import WelcomeAdmin from "./pages/WelcomeAdmin/WelcomeAdmin";
 import { Toaster } from "react-hot-toast";
 import { StoreContext } from "./context/StoreContext";
+import axios from "axios";
 
 const App = () => {
-  const url = ""; // ✅ no env anymore
+  const url = "";
   const { isAuthenticated } = useContext(StoreContext);
+
+  // ✅ CRITICAL: Set axios defaults
+  useEffect(() => {
+    axios.defaults.baseURL = "";
+    axios.defaults.headers.common["Content-Type"] = "application/json";
+  }, []);
 
   return (
     <div>
