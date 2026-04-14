@@ -15,44 +15,64 @@ import axios from "axios";
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showPaymentGateway, setshowPaymentGateway] = useState(false);
-  const [orderData,setOrderData] = useState({})
-  const {url} =useContext(StoreContext)
+  const [orderData, setOrderData] = useState({});
+  const { url } = useContext(StoreContext);
+
+  // ✅ CRITICAL: Set axios defaults for relative paths
+  useEffect(() => {
+    axios.defaults.baseURL = "";
+    axios.defaults.headers.common["Content-Type"] = "application/json";
+  }, []);
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const res = await axios.get("/api");
-      console.log(res);
-      toast.success(res.data.message);
-      clearInterval(intervalId);
-    } catch (error) {
-      console.error("Error connecting to server");
-      toast("Backend Server Take a while to Wake up, Please Wait!", {
-        icon: "⏳",
-      });
-    }
-  };
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("/api");
+        console.log("Backend response:", res);
+        if (res.data?.message) {
+          toast.success(res.data.message);
+        }
+        clearInterval(intervalId);
+      } catch (error) {
+        console.error("Error connecting to server:", error);
+        toast("Backend Server Take a while to Wake up, Please Wait!", {
+          icon: "⏳",
+        });
+      }
+    };
 
-  const intervalId = setInterval(fetchData, 30000);
+    const intervalId = setInterval(fetchData, 30000);
+    fetchData();
 
-  fetchData();
-
-  return () => clearInterval(intervalId);
-}, []);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
-      {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
-      {showPaymentGateway ? <PaymentGateway orderData={orderData} setshowPaymentGateway={setshowPaymentGateway}/>  : <></>}
+      {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : null}
+      {showPaymentGateway ? (
+        <PaymentGateway
+          orderData={orderData}
+          setshowPaymentGateway={setshowPaymentGateway}
+        />
+      ) : null}
       <div className="app">
         <Navbar setShowLogin={setShowLogin} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/placeorder" element={<PlaceOrder setshowPaymentGateway={setshowPaymentGateway} setOrderData={setOrderData} setShowLogin={setShowLogin}/>} />
-          <Route path='/myorders' element={<MyOrders />} />
-
+          <Route
+            path="/placeorder"
+            element={
+              <PlaceOrder
+                setshowPaymentGateway={setshowPaymentGateway}
+                setOrderData={setOrderData}
+                setShowLogin={setShowLogin}
+              />
+            }
+          />
+          <Route path="/myorders" element={<MyOrders />} />
         </Routes>
       </div>
       <Footer />
