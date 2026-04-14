@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: admin
-          image: mohanad898/admin:latest
+          image: mohanad898/admin:aws-v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
