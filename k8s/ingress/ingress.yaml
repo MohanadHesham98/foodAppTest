@@ -6,11 +6,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
+          # Frontend
           - path: /
             pathType: Prefix
             backend:
@@ -18,13 +21,17 @@ spec:
                 name: frontend
                 port:
                   number: 80
-          - path: /api
-            pathType: Prefix
+          
+          # Backend API - regex for proper routing
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: backend
                 port:
                   number: 5000
+          
+          # Admin
           - path: /admin
             pathType: Prefix
             backend:
