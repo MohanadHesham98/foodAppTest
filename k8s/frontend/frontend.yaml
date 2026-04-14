@@ -33,4 +33,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-  type: ClusterIP
+      nodePort: 30080  # ← أضف ده
+  type: NodePort       # ← غير من ClusterIP لـ NodePort
