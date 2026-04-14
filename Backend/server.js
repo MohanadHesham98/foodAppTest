@@ -85,13 +85,41 @@ app.use("/api/promo", PromoRouter);
 const __dirname = path.resolve();
 app.use("/images", express.static(path.join(__dirname, "uploads")));
 
-// Health check
+// ==========================
+// Health Check Endpoints
+// ==========================
+
+// Basic health check for ALB
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    service: "backend",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Root endpoint
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Backend Server is Awake" });
+  res.status(200).json({ 
+    message: "Backend Server is Awake",
+    status: "healthy"
+  });
+});
+
+// Detailed health check
+app.get("/api/health", (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+  
+  res.status(200).json({
+    status: "healthy",
+    service: "backend",
+    database: dbStatus,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // Start server
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port ${port}`);
 });
-

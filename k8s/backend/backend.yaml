@@ -13,8 +13,6 @@ spec:
       labels:
         app: backend
     spec:
-      nodeSelector:
-        role: public
       containers:
         - name: backend
           image: mohanad898/backend:aws-v1
@@ -26,7 +24,6 @@ spec:
                 name: backend-config
             - secretRef:
                 name: food-secrets
-          # Health check endpoint
           livenessProbe:
             httpGet:
               path: /health
@@ -52,5 +49,5 @@ spec:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-      nodePort: 30500  # ← ALB Target Group Port
+      nodePort: 30500
   type: NodePort

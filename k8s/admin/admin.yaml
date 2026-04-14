@@ -13,8 +13,6 @@ spec:
       labels:
         app: admin
     spec:
-      nodeSelector:
-        role: public
       containers:
         - name: admin
           image: mohanad898/admin:aws-v1
@@ -46,5 +44,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30081  # ← ALB Target Group Port
+      nodePort: 30081
   type: NodePort

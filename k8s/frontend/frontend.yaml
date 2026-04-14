@@ -13,8 +13,6 @@ spec:
       labels:
         app: frontend
     spec:
-      nodeSelector:
-        role: public
       containers:
         - name: frontend
           image: mohanad898/frontend:aws-v1
@@ -46,5 +44,5 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30080  # ← ALB Target Group Port (Default)
+      nodePort: 30080
   type: NodePort
